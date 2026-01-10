@@ -1,0 +1,128 @@
+soutenance BD avancé
+
+--CREACTION TABLE GEOLOCALISATION ---
+CREATE TABLE Geolocalisation(
+   id_region NUMBER,
+   region VARCHAR(50) NOT NULL,
+   Latitude REAL NOT NULL,
+   Longitude REAL NOT NULL,
+   PRIMARY KEY(id_region)
+);
+-----------------------
+
+--CREATION TABLE CLIENT-----------
+CREATE TABLE client (
+    id_client NUMBER,
+    nom_client VARCHAR2(50) NOT NULL,
+    prenom_client VARCHAR2(50) NOT NULL,
+    email_client VARCHAR2(50) NOT NULL,
+    telephone_client VARCHAR2(50) NOT NULL,
+    date_inscription_client DATE NOT NULL,
+    adresse VARCHAR2(50) NOT NULL,
+    ville VARCHAR2(50) NOT NULL,
+    region VARCHAR2(50) NOT NULL,
+    id_region NUMBER NOT NULL,
+    statut_client VARCHAR2(50) NOT NULL,
+
+    CONSTRAINT pk_client PRIMARY KEY (id_client),
+    CONSTRAINT fk_client_region
+        FOREIGN KEY (id_region)
+        REFERENCES geolocalisation(id_region)
+);
+-------------------------
+
+--CREATION TABLE COMMANDE-------
+CREATE TABLE COMMANDE(
+   Id_commande NUMBER,
+   Date_commande DATE NOT NULL,
+   Statut_commande VARCHAR(50) NOT NULL,
+   Montant_total REAL NOT NULL,
+   Mode_commande VARCHAR(50) NOT NULL,
+   id_client NUMBER NOT NULL,
+   PRIMARY KEY(Id_commande),
+   FOREIGN KEY(id_client) REFERENCES CLIENT(id_client)
+);
+----------------------
+
+--CREATION TABLE FOURNISSEUR----
+CREATE TABLE FOURNISSEUR(
+   Id_fournisseur NUMBER,
+   Nom_fournisseur VARCHAR(50) NOT NULL,
+   Nom_contact_fournisseur VARCHAR(50) NOT NULL,
+   Email_fournisseur VARCHAR(50) NOT NULL,
+   Numero_telephone_fournisseur VARCHAR(50) NOT NULL,
+   Adresse_fournisseur VARCHAR(50) NOT NULL,
+   id_region NUMBER NOT NULL,
+   PRIMARY KEY(Id_fournisseur),
+   FOREIGN KEY(id_region) REFERENCES Geolocalisation(id_region)
+);
+---------------------------
+
+--CREATION TABLE PAIEMENT----------
+CREATE TABLE PAIEMENT(
+   Id_paiement NUMBER,
+   Date_paiement DATE NOT NULL,
+   Montant_paye REAL NOT NULL,
+   Mode_paiement VARCHAR(50) NOT NULL,
+   Statut_paiement VARCHAR(50) NOT NULL,
+   Id_commande NUMBER NOT NULL,
+   PRIMARY KEY(Id_paiement),
+   FOREIGN KEY(Id_commande) REFERENCES COMMANDE(Id_commande)
+);
+--------------------------------
+
+--CREATION DE LA TABLE LIVRAISON------
+CREATE TABLE LIVRAISON(
+   Id_livraison NUMBER,
+   Date_livraison DATE NOT NULL,
+   Date_expedition DATE NOT NULL,
+   Statut_livraison VARCHAR(50) NOT NULL,
+   Transporteur VARCHAR(50) NOT NULL,
+   Id_commande NUMBER NOT NULL,
+   PRIMARY KEY(Id_livraison),
+   FOREIGN KEY(Id_commande) REFERENCES COMMANDE(Id_commande)
+);
+--------------------------------
+
+--CREATION DE LA TABLE PRODUIT---------
+CREATE TABLE PRODUIT(
+   Id_produit NUMBER,
+   Nom_produit VARCHAR(50) NOT NULL,
+   Categorie_produit VARCHAR(50) NOT NULL,
+   Description_produit VARCHAR(1024) NOT NULL,
+   Prix_produit REAL NOT NULL,
+   Stock_disponible NUMBER NOT NULL,
+   Id_fournisseur NUMBER NOT NULL,
+   PRIMARY KEY(Id_produit),
+   FOREIGN KEY(Id_fournisseur) REFERENCES FOURNISSEUR(Id_fournisseur)
+);
+------------------------------------
+
+--CREATION DE LA TABLE AVIS-------
+CREATE TABLE AVIS(
+   Id_avis NUMBER,
+   Note NUMBER NOT NULL,
+   Commentaire VARCHAR(1024) NOT NULL,
+   Date_avis DATE NOT NULL,
+   id_client NUMBER NOT NULL,
+   Id_produit NUMBER NOT NULL,
+   PRIMARY KEY(Id_avis),
+   FOREIGN KEY(id_client) REFERENCES CLIENT(id_client),
+   FOREIGN KEY(Id_produit) REFERENCES PRODUIT(Id_produit)
+);
+-----------------------------------
+
+--CREATION TABLE ARTICLES_COMMANDE-----
+CREATE TABLE ARTICLES_DE_COMMANDE(
+   Id_article_commande NUMBER,
+   Quantite NUMBER NOT NULL,
+   Prix_unitaire REAL NOT NULL,
+   Id_produit NUMBER NOT NULL,
+   Id_commande NUMBER NOT NULL,
+   PRIMARY KEY(Id_article_commande),
+   FOREIGN KEY(Id_produit) REFERENCES PRODUIT(Id_produit),
+   FOREIGN KEY(Id_commande) REFERENCES COMMANDE(Id_commande)
+);
+---------------------------------------
+
+COMMIT;

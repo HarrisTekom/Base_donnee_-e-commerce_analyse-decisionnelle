@@ -1,0 +1,19 @@
+id_region,region,latitude,longitude
+1,Auvergne-Rhône-Alpes,45.447143,4.385250
+2,Bourgogne-Franche-Comté,47.280512,4.999437
+3,Bretagne,48.202047,-2.932644
+4,Centre-Val de Loire,47.751569,1.675063
+5,Corse,42.039604,9.012893
+6,Grand Est,48.699803,6.187807
+7,Hauts-de-France,49.894483,2.988196
+8,Île-de-France,48.849919,2.637041
+9,Normandie,49.182863,0.370679
+10,Nouvelle-Aquitaine,45.708718,0.626891
+11,Occitanie,43.892723,3.282762
+12,Pays de la Loire,47.478419,-0.563166
+13,Provence-Alpes-Côte d'Azur,43.935169,6.067919
+14,Guadeloupe,16.265000,-61.551000
+15,Martinique,14.641528,-61.024174
+16,Guyane,3.933889,-53.125782
+17,La Réunion,-21.115141,55.536384
+18,Mayotte,-12.827500,45.166244
