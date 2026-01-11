@@ -1,4 +1,4 @@
-soutenance BD avancé
+
 
 --CREACTION TABLE GEOLOCALISATION ---
 CREATE TABLE Geolocalisation(
