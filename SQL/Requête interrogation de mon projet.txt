@@ -1,0 +1,175 @@
+		Requête interrogation de mon projet
+
+/*1) toutes les colonnes et toutes les lignes d'une table*/
+select * 
+from client --afficher les elements d'une table(remplacer juste le nom de la table pour afficher une table
+
+                
+/*2) Nombre de client inscrit et aussi le nombre de commande totale*/
+SELECT 'Nous avons ' || COUNT(*) || ' clients inscrits sur la plateforme e-commerce.'
+FROM client;  --affiche le nombre totale de client inscrit.
+//
+SELECT 'Nous avons ' || COUNT(*) || ' ommandes effectuées sur la plateforme e-commerce.'
+FROM commande;  --affiche le nombre totale de commande effectué.
+
+
+/*3) répartition Clients actifs / inactifs (statut stocké)*/
+SELECT 
+    statut_client,
+    COUNT(*) AS nombre_client,                  --nombre de clients par statut
+   ROUND(                --arrondir à 2 décimales
+       COUNT(*) * 100.0 / (SELECT COUNT(*) FROM client),     -- calcul du pourcentage
+       2
+    ) AS EN_pourcentage
+FROM client
+GROUP BY statut_client;
+
+
+/*5) client ayant effectué au moins une commande et ceux ayant effectué aucune commande*/
+SELECT COUNT(DISTINCT id_client) AS clients_ayant_commande
+FROM commande;
+--
+SELECT COUNT(*) AS clients_sans_commande
+FROM client c1
+LEFT JOIN commande C2 ON c1.id_client = C2.id_client
+WHERE C2.id_commande IS NULL;
+
+
+/*6) Nombre_client par année*/
+SELECT COUNT(DISTINCT id_client) AS Nombre_clients,
+    EXTRACT(YEAR FROM date_commande) AS annee
+FROM commande
+GROUP BY EXTRACT(YEAR FROM date_commande)
+order by annee;
+--
+SELECT COUNT(DISTINCT id_client) AS Nombre_clients,
+--EXTRACT(YEAR FROM date_commande) AS annee
+--EXTRACT(MONTH FROM date_commande) AS mois
+TO_CHAR(date_commande, 'YYYY-MM') AS  Douze_dernier_mois
+FROM commande
+WHERE date_commande BETWEEN
+      TO_DATE('2025-01', 'YYYY-MM') AND TO_DATE('2025-12', 'YYYY-MM')
+GROUP BY TO_CHAR(date_commande, 'YYYY-MM')
+order by Douze_dernier_mois;
+
+
+/*7) Nombre de client de client par region */
+select 
+    count(id_client) as Nombre_client, 
+    region
+from client
+group by region
+order by Nombre_client DESC
+
+
+/*8) Nombre de commande par region */
+select
+        g.region,
+        count(co.id_commande) as Nombre_commande
+from client cl
+inner join commande co on cl.id_client = co.id_client
+inner join geolocalisation g on cl.id_region = g.id_region
+group by g.region
+order by Nombre_commande DESC
+
+
+/*9) Chiffre d’affaires total de cette structure de 01/2019 - 12/2025 (6ans)*/
+SELECT 
+    SUM(montant_total) as Chiffre_Affaire
+FROM commande
+--WHERE statut_commande = 'livrée';
+
+
+/*10) Chiffre d’affaires total par mois de cette structure de 01/2019 - 12/2025 (6ans)*/
+SELECT
+    TO_CHAR(date_commande, 'YYYY-MM') AS mois,
+    SUM(montant_total) AS chiffre_affaire
+FROM commande
+--WHERE statut_commande = 'livrée'
+GROUP BY TO_CHAR(date_commande, 'YYYY-MM')
+ORDER BY mois;
+
+
+/*11) Chiffre d’affaires total par année de cette structure de 01/2019 - 12/2025 (6ans)*/
+SELECT
+    EXTRACT(YEAR FROM date_commande) AS annee,
+    EXTRACT(MONTH FROM date_commande) AS mois,
+    SUM(montant_total) AS chiffre_affaire
+FROM commande
+WHERE statut_commande = 'livrée'
+GROUP BY EXTRACT(YEAR FROM date_commande),
+ORDER BY annee;
+
+
+/*12) Répartition des commandes par statut (livrée, expédiée, en cours, échouée)*/
+select 
+    count(id_commande) as Nombre_commande, 
+    statut_commande
+from commande
+group by statut_commande
+
+
+/*13) Délai moyen de livraison et performance par transporteur*/
+        --Délai moyen de livraison
+SELECT 
+    ROUND(AVG(date_livraison - date_expedition), 2) AS delai_moyen_livraison_jours
+FROM livraison
+WHERE statut_livraison = 'livrée';
+        --performance par transporteur
+--Délai moyen de livraison par transporteur
+SELECT 
+    transporteur,
+    COUNT(id_livraison) AS total_livraisons,
+    ROUND(AVG(date_livraison - date_expedition), 2) AS delai_moyen_jours
+FROM livraison
+WHERE statut_livraison = 'livrée'
+GROUP BY transporteur
+ORDER BY total_livraisons DESC;
+
+
+/*14) Note moyenne par categorie de produit*/
+SELECT 
+    p.id_produit,
+    p.categorie_produit,
+    Round(AVG(a.note), 2) AS note_moyenne,
+    COUNT(a.id_avis) AS nombre_avis
+FROM produit p 
+left JOIN avis a
+    ON p.id_produit = a.id_produit
+GROUP BY p.id_produit, p.categorie_produit
+ORDER BY nombre_avis DESC;
+
+
+/*15) Chiffre d'affaire par categorie de produit*/
+select p.categorie_produit,SUM(a.quantite * a.prix_unitaire) AS CA_categorie_produit
+from articles_de_commande a
+inner join commande c on a.id_commande = c.id_commande
+inner join produit p on a.id_produit = p.id_produit
+--where c.statut_commande='livrée'
+group by p.categorie_produit
+order by CA_categorie_produit DESC
+
+
+/*16) le taux de client sans avis*/
+SELECT 
+    ROUND(
+        SUM(CASE                                 -- Si aucun avis n'est trouvé pour le client
+                WHEN a.id_avis IS NULL THEN 1          
+                ELSE 0                          -- Sinon (le client a au moins un avis)
+            END) * 100.0 / COUNT(*),
+        2       -- On arrondit le résultat à 2 décimales
+    ) AS taux_clients_sans_avis
+FROM client c
+LEFT JOIN avis a ON c.id_client = a.id_client    --Jointure à gauche
+
+
+/*17) Nombre de commande effectué par client  */
+select 
+    cl.nom_client,cl.prenom_client,cl.email_client,
+    count(co.id_commande) as Nombre_commande
+from client cl
+INNER JOIN commande co
+on cl.id_client=co.id_client
+--where co.statut_commande = 'livrée'
+group by cl.nom_client,cl.prenom_client,cl.email_client
+order by Nombre_commande DESC
