@@ -7,18 +7,18 @@ from client --afficher les elements d'une table(remplacer juste le nom de la tab
                 
 /*2) Nombre de client inscrit et aussi le nombre de commande totale*/
 SELECT 'Nous avons ' || COUNT(*) || ' clients inscrits sur la plateforme e-commerce.'
-FROM client;  --affiche le nombre totale de client inscrit.
+FROM client;  
 //
 SELECT 'Nous avons ' || COUNT(*) || ' ommandes effectuées sur la plateforme e-commerce.'
-FROM commande;  --affiche le nombre totale de commande effectué.
+FROM commande; 
 
 
 /*3) répartition Clients actifs / inactifs (statut stocké)*/
 SELECT 
     statut_client,
-    COUNT(*) AS nombre_client,                  --nombre de clients par statut
+    COUNT(*) AS nombre_client,                 
    ROUND(                --arrondir à 2 décimales
-       COUNT(*) * 100.0 / (SELECT COUNT(*) FROM client),     -- calcul du pourcentage
+       COUNT(*) * 100.0 / (SELECT COUNT(*) FROM client),    
        2
     ) AS EN_pourcentage
 FROM client
@@ -153,14 +153,14 @@ order by CA_categorie_produit DESC
 /*16) le taux de client sans avis*/
 SELECT 
     ROUND(
-        SUM(CASE                                 -- Si aucun avis n'est trouvé pour le client
+        SUM(CASE                                 
                 WHEN a.id_avis IS NULL THEN 1          
-                ELSE 0                          -- Sinon (le client a au moins un avis)
+                ELSE 0                          
             END) * 100.0 / COUNT(*),
         2       -- On arrondit le résultat à 2 décimales
     ) AS taux_clients_sans_avis
 FROM client c
-LEFT JOIN avis a ON c.id_client = a.id_client    --Jointure à gauche
+LEFT JOIN avis a ON c.id_client = a.id_client
 
 
 /*17) Nombre de commande effectué par client  */
